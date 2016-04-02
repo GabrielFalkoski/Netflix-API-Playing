@@ -1,26 +1,65 @@
 # It runs in all pages
 App.pages.home = ($) ->
-  App.modules.search($)
-
-# Links a posts
-$('.ajax-pagination').delegate 'a', 'click', (e) ->
-  self = $(this)
-  url = self.attr('href')
-  
-  if ( url.indexOf( App.baseurl ) isnt -1 || url.substr(0,1) is '?' )
+  # Links a posts
+  $('.show-more').on 'click', (e) ->
     e.preventDefault()
-    content = self.closest('article').find('.content')
-    content.animate {opacity:0.4}, ->
-      $.get url, {ajax:true}, (response) ->
-        content.html(response).animate {opacity:1}
+    App.moviesPage++
+    App.modules.templateMovies(App.moviesPage)
+    $('input', $(this)).attr('checked', false)
+    $('.show-more').fadeOut() if App.moviesPage == App.moviesPagesTotal
 
-# Search
-App.modules.search = ($) ->
   s = $('#s')
   s.parent().submit (e) ->
     e.preventDefault()
-  s.keypress (e) ->
+    s.focusout()
+  .keypress (e) ->
     if ( 13 is e.which )
-      $.get '//netflixroulette.net/api/api.php', {actor:s.val()}, (r) ->
-        $.each r, (i, movie) ->
-          console.log movie.show_title
+      App.modules.searchMovies(s.val())
+    if ( s.val().length > 5 )
+      App.modules.searchMovies(s.val())
+   
+  $.template 'movieTemplate', App.movieMarkup
+  
+  App.modules.sortMovies($)
+
+# Search
+App.modules.searchMovies = (val) ->
+  $.ajax
+    method: "GET"
+    url: '//netflixroulette.net/api/api.php' 
+    data:
+      actor:val
+  .done (r) ->
+    movies = jQuery('#movies')
+    movies.empty()
+    App.modules.showMovies(r)
+    $('#sort-movies').fadeIn 400, ->
+      $('input', $(this)).attr('checked', false)
+      $('.show-more').fadeIn()
+  .fail (r) ->
+    alert r.responseJSON.message
+  .always () ->
+
+# Sort
+App.modules.sortMovies = ($) ->
+  $("#movies").mixItUp
+    layout:
+      containerClass: 'list'
+
+# Movies
+App.modules.showMovies = (data) ->
+  count = data.length
+  i = 1
+  l = Math.ceil(count / 5)
+  App.moviesPagesTotal = l
+  while i <= l
+    f = i-1
+    s = if i == l then count else i*5 
+    this.showMovies[i] = data.slice(f*5,s)
+    i++
+  App.moviesPage = 1
+  App.modules.templateMovies(1)
+
+App.modules.templateMovies = (page) ->
+  console.log page
+  $.tmpl('movieTemplate', App.modules.showMovies[page]).appendTo '#movies'

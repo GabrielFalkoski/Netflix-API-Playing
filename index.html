@@ -12,21 +12,58 @@
 	<script>
 		var App = {
 			modules: {},
-			pages: {}
+			pages: {},
+			movieMarkup: '<article id="movie-${show_id}" data-name="${show_title}" data-year="${release_year}" data-duration="${runtime.replace("min", "")}" data-rating="${rating}" class="mix movie">' +
+				'<section class="movie-content">' + 
+					'<h2 class="movie-title">${show_title}</h2>' +
+					'<div class="movie-info">' +
+						'<span>${release_year} - ${runtime} -- Director: ${director}</span>' +
+					'</div>' +
+					'<section class="movie-summary">' +
+						'<h3 class="movie-subtitle">Summary:</h3>' +
+						'<p>${summary}</p>' +
+					'</section>' +
+					'<section class="movie-cast">' +
+						'<h3 class="movie-subtitle"><i>Cast:</i></h3>' +
+						'<p><i>${show_cast}</i></p>' +
+					'</section>' +
+					'<aside class="movie-rating">' +
+						'<p>Rating:</p>' +
+						'<div class="rating-value"><span>${rating}</span></div>' +
+					'</aside>' +
+				'</section>' +
+			'</article>'
 		};
 	</script>
 </head>
 
 <body class="home">
 	<header id="header">
-		<form id="s-netflix" action="">
-			<input type="text" placeholder="Type an actor/actress name" id="s">
-		</form>
+		<div class="wrap">	
+			<form id="s-netflix" action="">
+				<input type="text" placeholder="Type an actor/actress name" id="s">
+				<div id="sort-movies">
+					<span>Sort by:</span>
+					<input id="s-title" data-sort="name:desc" class="sort" type="radio" name="sort">
+					<label for="s-title">Title</label>
+					<input id="s-year" data-sort="year:desc" class="sort" type="radio" name="sort">
+					<label for="s-year">Released year</label>
+					<input id="s-duration" data-sort="duration:desc" class="sort" type="radio" name="sort">
+					<label for="s-duration">Duration</label>
+					<input id="s-rating" data-sort="rating:desc" class="sort" type="radio" name="sort">
+					<label for="s-rating">Rating</label>
+				</div>
+			</form>
+		</div>
 	</header>
 
-	<article id="main">
+	<article id="main" class="wrap">
+
+		<article id="movies">
 			
-		
+		</article>
+
+		<a class="show-more" href="">Show more</a>
 		
 	</article>
 
@@ -36,6 +73,7 @@
 
 <script type="text/javascript" src="js/vendor/jquery-2.2.2.min.js"></script>
 <script type="text/javascript" src="js/vendor/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="js/vendor/jquery.mixitup.js"></script>
 <script type="text/javascript" src="js/build/app.js"></script>
 
 <script type="text/javascript">
